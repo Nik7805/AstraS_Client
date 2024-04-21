@@ -1,15 +1,15 @@
 #include <thread>
 #include <chrono>
-#include "udpsender.hpp"
+#include "udp_pipeline.hpp"
 
 using namespace std::chrono_literals;
 
-UDPSender::UDPSender(const std::string ip, uint16_t port)
+UDPipeline::UDPipeline(const std::string ip, uint16_t port)
 {
     m_FD = socket(AF_INET, SOCK_DGRAM, 0);
 
     if(m_FD < 0)
-        throw Exceptions::OPEN_SOCK_ERR;
+        throw 0;
     
     bzero(&m_ServAddr, sizeof(m_ServAddr));
 
@@ -18,17 +18,39 @@ UDPSender::UDPSender(const std::string ip, uint16_t port)
     m_ServAddr.sin_port = htons(port);
 }
 
-UDPSender::~UDPSender()
+UDPipeline::~UDPipeline()
 {
     close(m_FD);
 }
 
-int UDPSender::Send(std::string &msg) const
+void UDPipeline::SendFrame(OBFormat format, uint16_t width, uint16_t height, void *data)
 {
-    return this->Send((void*)msg.c_str(), msg.length());
+    VideoFrameHeader_t header;
+    header.width = width;
+    header.height = height;
+
+    switch (format)
+    {
+    case OB_FORMAT_GRAY:
+    case OB_FORMAT_Y16:
+    case OB_FORMAT_UYVY:
+        header.depth = 2;
+        break;
+    
+    default:
+        std::cerr << "Unsupported frame format!\n";
+        return;
+    }
+
+    size_t iBytes = static_cast<size_t>(header.depth) *
+                    static_cast<size_t>(header.height) *
+                    static_cast<size_t>(header.width);
+    
+    SendRaw(static_cast<void*>(&header), sizeof(VideoFrameHeader_t));
+    SendRaw(data, iBytes);
 }
 
-int UDPSender::Send(void *data, size_t bytes) const
+int UDPipeline::SendRaw(void *data, size_t bytes) const
 {
     const size_t MAX_MSG_SIZE = 1500;
     ssize_t result;
@@ -64,6 +86,7 @@ int UDPSender::Send(void *data, size_t bytes) const
         else
             sendedBytes += result;
 
+        //std::this_thread::yield();
         std::this_thread::sleep_for(1us);
     }
 
