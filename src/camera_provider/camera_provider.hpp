@@ -32,6 +32,8 @@ public:
                 GetFrameWidth,
                 GetFrameHeight,
                 StartStream,
+
+                NofCommands
             };
             Type CommandType = Type::None;
             uint64_t Parameter = 0;
