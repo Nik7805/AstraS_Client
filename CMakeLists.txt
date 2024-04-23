@@ -30,6 +30,7 @@ add_executable(
     src/camera_provider/camera_provider.cpp
     src/camera_provider/udp_pipeline.cpp
     src/camera_provider/debug_commander.cpp
+    src/camera_provider/tcp_commander.cpp
 )
 
 set(OrbbecSDK_ROOT_DIR ${CMAKE_SOURCE_DIR}/SDK)
