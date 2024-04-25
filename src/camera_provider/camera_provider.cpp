@@ -239,13 +239,12 @@ void CameraProvider::ExecuteStreamControl(uint64_t param)
         m_ContinueStream = true;
         std::thread t([this]{this->CameraThread();});
         t.detach();
-        std::this_thread::sleep_for(10ms);
     }
     else
     {
         m_ContinueStream = false;
-        std::this_thread::sleep_for(200ms);
     }
+    std::this_thread::sleep_for(200ms);
 
     responce = (bParam == m_StreamIsRunning) ? 0 : 2;
 

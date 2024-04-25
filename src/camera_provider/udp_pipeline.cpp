@@ -86,8 +86,8 @@ int UDPipeline::SendRaw(void *data, size_t bytes) const
         else
             sendedBytes += result;
 
-        //std::this_thread::yield();
-        std::this_thread::sleep_for(1us);
+        std::this_thread::yield();
+        // std::this_thread::sleep_for(1us);
     }
 
     return (result < 0) ? result : sendedBytes + result;
