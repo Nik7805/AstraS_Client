@@ -36,6 +36,13 @@ void UDPipeline::SendFrame(OBFormat format, uint16_t width, uint16_t height, voi
     case OB_FORMAT_UYVY:
         header.depth = 2;
         break;
+    case OB_FORMAT_BGR:
+    case OB_FORMAT_RGB:
+        header.depth = 3;
+        break;
+    case OB_FORMAT_Y8:
+        header.depth = 1;
+        break;
     
     default:
         std::cerr << "Unsupported frame format!\n";
